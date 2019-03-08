@@ -1,8 +1,9 @@
-import sys
-import re
-import requests
 import json
 import os
+import re
+import sys
+
+import requests
 
 
 def main(args):
