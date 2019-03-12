@@ -18,10 +18,19 @@ def main(args):
                     directory = args[1]
                 except IndexError:
                     pass
-                for image in json.loads(match.group(1))['album_images']['images']:
-                    result = requests.get('https://i.imgur.com/' + image['hash'] + image['ext'])
+
+                data = json.loads(match.group(1))
+                images = []
+                if 'album_images' in data:
+                    for image in data['album_images']['images']:
+                        images.append(image['hash'] + image['ext'])
+                else:
+                    images.append(data['hash'] + data['ext'])
+
+                for image in images:
+                    result = requests.get('https://i.imgur.com/' + image)
                     if result.status_code == 200:
-                        filename = image['hash'] + image['ext']
+                        filename = image
                         with open(os.path.join(directory, filename), 'wb') as file:
                             file.write(result.content)
 
