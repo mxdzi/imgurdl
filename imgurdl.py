@@ -21,16 +21,22 @@ def main(args):
 
                 data = json.loads(match.group(1))
                 images = []
+                is_album = False
+
                 if 'album_images' in data:
+                    is_album = True
                     for image in data['album_images']['images']:
                         images.append(image['hash'] + image['ext'])
                 else:
                     images.append(data['hash'] + data['ext'])
 
-                for image in images:
+                for i, image in enumerate(images):
                     result = requests.get('https://i.imgur.com/' + image)
                     if result.status_code == 200:
-                        filename = image
+                        if is_album:
+                            filename = '{:0>2d}_{}'.format(i + 1, image)
+                        else:
+                            filename = image
                         with open(os.path.join(directory, filename), 'wb') as file:
                             file.write(result.content)
 
