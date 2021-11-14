@@ -10,7 +10,7 @@ def main(args):
     if len(args):
         result = requests.get(args[0])
         if result.status_code == 200:
-            match = re.search(r"\n\s*image\s*:\s*({.*})", result.text)
+            match = re.search(r'<script>window.postDataJSON="(.*)"</script>', result.text)
             if match:
                 directory = ''
                 try:
@@ -19,16 +19,14 @@ def main(args):
                 except IndexError:
                     pass
 
-                data = json.loads(match.group(1))
+                data = json.loads(match.group(1).replace("\\", ""))
                 images = []
                 is_album = False
 
-                if 'album_images' in data:
+                if len(data['media']) > 1:
                     is_album = True
-                    for image in data['album_images']['images']:
-                        images.append(image['hash'] + image['ext'])
-                else:
-                    images.append(data['hash'] + data['ext'])
+                for image in data['media']:
+                    images.append(image['id'] + "." + image['ext'])
 
                 for i, image in enumerate(images):
                     result = requests.get('https://i.imgur.com/' + image)
