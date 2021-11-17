@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import re
@@ -6,18 +7,16 @@ import sys
 import requests
 
 
-def main(args):
-    if len(args):
-        result = requests.get(args[0])
+def main(url, directory):
+    if len(url):
+        result = requests.get(url)
         if result.status_code == 200:
             match = re.search(r'<script>window.postDataJSON="(.*)"</script>', result.text)
             if match:
-                directory = ''
-                try:
-                    os.makedirs(args[1])
-                    directory = args[1]
-                except IndexError:
-                    pass
+                if directory:
+                    os.makedirs(directory)
+                else:
+                    directory = ""
 
                 data = json.loads(match.group(1).replace("\\", ""))
                 images = []
@@ -40,4 +39,8 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("URL", help="Full imgur url to image/gallery")
+    parser.add_argument("DIR", nargs="?", help="Directory to save images")
+    args = parser.parse_args()
+    main(args.URL, args.DIR)
