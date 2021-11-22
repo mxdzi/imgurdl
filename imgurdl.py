@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import re
+from typing import Optional
 
 import requests
 
@@ -10,20 +11,21 @@ logging.basicConfig(format="%(asctime)s %(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
-def get_images_data(url):
+def get_images_data(url: str) -> Optional[dict]:
     try:
         result = requests.get(url)
         if result.status_code == 200:
             match = re.search(
                 r'<script>window.postDataJSON="(.*)"</script>', result.text
             )
-            return json.loads(match.group(1).replace("\\", ""))
+            if match:
+                return json.loads(match.group(1).replace("\\", ""))
     except Exception as ex:
         logger.error("Can't get gallery data: %s", ex)
-        pass
+    return None
 
 
-def main(url, directory):
+def main(url: str, directory: str) -> None:
     data = get_images_data(url)
     if data:
         if directory:
