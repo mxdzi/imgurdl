@@ -25,6 +25,18 @@ def get_images_data(url: str) -> Optional[dict]:
     return None
 
 
+def download_images(images: list, directory: str, is_album: bool) -> None:
+    for i, image in enumerate(images):
+        result = requests.get("https://i.imgur.com/" + image)
+        if result.status_code == 200:
+            if is_album:
+                filename = "{:0>2d}_{}".format(i + 1, image)
+            else:
+                filename = image
+            with open(os.path.join(directory, filename), "wb") as file:
+                file.write(result.content)
+
+
 def main(url: str, directory: str) -> None:
     data = get_images_data(url)
     if data:
@@ -41,15 +53,8 @@ def main(url: str, directory: str) -> None:
         for image in data["media"]:
             images.append(image["id"] + "." + image["ext"])
 
-        for i, image in enumerate(images):
-            result = requests.get("https://i.imgur.com/" + image)
-            if result.status_code == 200:
-                if is_album:
-                    filename = "{:0>2d}_{}".format(i + 1, image)
-                else:
-                    filename = image
-                with open(os.path.join(directory, filename), "wb") as file:
-                    file.write(result.content)
+        download_images(images, directory, is_album)
+
     else:
         exit(1)
 
