@@ -3,7 +3,7 @@ import json
 import logging
 import os
 import re
-from typing import Optional
+from typing import Optional, Tuple
 
 import requests
 
@@ -23,6 +23,18 @@ def get_images_data(url: str) -> Optional[dict]:
     except Exception as ex:
         logger.error("Can't get gallery data: %s", ex)
     return None
+
+
+def create_images_list(data: dict) -> Tuple[list, bool]:
+    images = []
+    is_album = False
+
+    if len(data["media"]) > 1:
+        is_album = True
+    for image in data["media"]:
+        images.append(image["id"] + "." + image["ext"])
+
+    return images, is_album
 
 
 def download_images(images: list, directory: str, is_album: bool) -> None:
@@ -53,17 +65,8 @@ def main(url: str, directory: Optional[str]) -> None:
     data = get_images_data(url)
     if data:
         directory = create_directory(directory)
-
-        images = []
-        is_album = False
-
-        if len(data["media"]) > 1:
-            is_album = True
-        for image in data["media"]:
-            images.append(image["id"] + "." + image["ext"])
-
+        images, is_album = create_images_list(data)
         download_images(images, directory, is_album)
-
     else:
         exit(1)
 
