@@ -37,13 +37,22 @@ def download_images(images: list, directory: str, is_album: bool) -> None:
                 file.write(result.content)
 
 
-def main(url: str, directory: str) -> None:
+def create_directory(directory: Optional[str]) -> str:
+    if directory:
+        try:
+            os.makedirs(directory)
+        except OSError as ex:
+            logger.error("Can't create a directory: %s", ex)
+            exit(1)
+    else:
+        directory = ""
+    return directory
+
+
+def main(url: str, directory: Optional[str]) -> None:
     data = get_images_data(url)
     if data:
-        if directory:
-            os.makedirs(directory)
-        else:
-            directory = ""
+        directory = create_directory(directory)
 
         images = []
         is_album = False
