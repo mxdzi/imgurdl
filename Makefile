@@ -3,6 +3,7 @@ help:
 	@echo "lint     - run black, mypy"
 	@echo "black    - run black"
 	@echo "mypy     - run mypy"
+	@echo "test     - run pytest"
 
 .PHONY: black
 black:
@@ -14,3 +15,7 @@ mypy:
 
 .PHONY: lint
 lint: black mypy
+
+.PHONY: test
+test:
+	pytest -v
