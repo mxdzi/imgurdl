@@ -3,11 +3,11 @@ help:
 	@echo "lint     - run black, mypy"
 	@echo "black    - run black"
 	@echo "mypy     - run mypy"
-	@echo "test     - run pytest"
+	@echo "test     - run pytest with code coverage"
 
 .PHONY: black
 black:
-	black imgurdl.py
+	black *.py
 
 .PHONY: mypy
 mypy:
