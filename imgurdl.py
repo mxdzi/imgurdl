@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_images_data(url: str) -> Optional[dict]:
+    logger.info("Downloading images data")
     try:
         result = requests.get(url)
         if result.status_code == 200:
@@ -33,12 +34,14 @@ def create_images_list(data: dict) -> Tuple[list, bool]:
         is_album = True
     for image in data["media"]:
         images.append(image["id"] + "." + image["ext"])
+    logger.info("Found %s image(s)", len(images))
 
     return images, is_album
 
 
 def download_images(images: list, directory: str, is_album: bool) -> None:
     for i, image in enumerate(images):
+        logger.info("Downloading image %s", i + 1)
         result = requests.get("https://i.imgur.com/" + image)
         if result.status_code == 200:
             if is_album:
@@ -67,6 +70,7 @@ def main(url: str, directory: Optional[str]) -> None:
         directory = create_directory(directory)
         images, is_album = create_images_list(data)
         download_images(images, directory, is_album)
+        logger.info("Done")
     else:
         exit(1)
 
@@ -75,5 +79,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("URL", help="Full imgur url to image/gallery")
     parser.add_argument("DIR", nargs="?", help="Directory to save images")
+    parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
+    if args.verbose:
+        logger.setLevel("INFO")
     main(args.URL, args.DIR)
