@@ -18,4 +18,4 @@ lint: black mypy
 
 .PHONY: test
 test:
-	pytest -v
+	pytest -v --cov imgurdl --cov-report html --cov-report term
