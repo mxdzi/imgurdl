@@ -1,4 +1,6 @@
-from imgurdl import create_images_list
+import pytest
+
+from imgurdl import create_images_list, main
 
 
 def test_create_images_list_no_image():
@@ -104,3 +106,12 @@ def test_create_images_list_many_images():
     images, is_album = create_images_list(data)
     assert is_album is True
     assert images == ["qTd0bH9.png", "Qn5kDvt.jpeg", "UuD3z8B.jpeg"]
+
+
+def test_main_no_data(mocker):
+    mocker.patch("imgurdl.get_images_data", return_value=None)
+    with pytest.raises(SystemExit) as e:
+        main("https://example.com/example", None)
+
+    assert e.type == SystemExit
+    assert e.value.code == 1
